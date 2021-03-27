@@ -10,4 +10,4 @@ pip install PyQt5
 
 and then simply run with:
 python frontend.py.
-![Capture](https://user-images.githubusercontent.com/3312076/112705099-a37a0c00-8e73-11eb-8c70-a434e9017e90.PNG)
+![Capture](https://user-images.githubusercontent.com/3312076/112706332-ed65f080-8e79-11eb-8855-8d1b873c7dde.PNG)
