@@ -74,7 +74,7 @@ class Ui_MainWindow(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.SnipetsBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.SnipetsBox.setGeometry(QtCore.QRect(180, 10, 161, 761))
+        self.SnipetsBox.setGeometry(QtCore.QRect(180, 10, 180, 761))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -83,30 +83,30 @@ class Ui_MainWindow(object):
 
         #Our Snipet List. When user clicks, we update the code window.
         self.SnipListBox = QtWidgets.QListWidget(self.SnipetsBox)
-        self.SnipListBox.setGeometry(QtCore.QRect(10, 150, 141, 571))
+        self.SnipListBox.setGeometry(QtCore.QRect(10, 150, 160, 571))
         self.SnipListBox.setObjectName("SnipListBox")
         self.SnipListBox.itemClicked.connect(self.SetCode)
 
 
         self.SnipAddEdit = QtWidgets.QLineEdit(self.SnipetsBox)
-        self.SnipAddEdit.setGeometry(QtCore.QRect(10, 100, 141, 20))
+        self.SnipAddEdit.setGeometry(QtCore.QRect(10, 100, 160, 20))
         self.SnipAddEdit.setObjectName("SnipAddEdit")
 
         #Button for Adding Codes to the currently selected Category(Table)
         self.SnipAddBtn = QtWidgets.QPushButton(self.SnipetsBox)
-        self.SnipAddBtn.setGeometry(QtCore.QRect(10, 120, 141, 23))
+        self.SnipAddBtn.setGeometry(QtCore.QRect(10, 120, 160, 23))
         self.SnipAddBtn.setObjectName("SnipAddBtn")
         self.SnipAddBtn.clicked.connect(self.AddSnipet)
 
         #Button for removing Snipets
         self.SnipRemoveBtn = QtWidgets.QPushButton(self.SnipetsBox)
-        self.SnipRemoveBtn.setGeometry(QtCore.QRect(10, 730, 141, 23))
+        self.SnipRemoveBtn.setGeometry(QtCore.QRect(10, 730, 160, 23))
         self.SnipRemoveBtn.setObjectName("SnipRemoveBtn")
         self.SnipRemoveBtn.clicked.connect(self.RemoveSnip)
 
         #When user types in filter, we filter the snip list.
         self.SnipFilterEdit = QtWidgets.QLineEdit(self.SnipetsBox)
-        self.SnipFilterEdit.setGeometry(QtCore.QRect(10, 60, 141, 20))
+        self.SnipFilterEdit.setGeometry(QtCore.QRect(10, 60, 160, 20))
         self.SnipFilterEdit.setObjectName("SnipFilterEdit")
         self.SnipFilterEdit.textChanged.connect(self.UpdateSnipets)
 
