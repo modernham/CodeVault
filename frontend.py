@@ -166,9 +166,13 @@ class Ui_MainWindow(object):
     # Button Event Handling
     def AddCategory(self):
         catExists = False
+        catValid = True
         catList = [self.CatListBox.item(i).text() for i in range(self.CatListBox.count())]
         if(self.CatAddEdit.text()):
-            if not (self.CatAddEdit.text()[0].isdigit()):
+            for chars in self.CatAddEdit.text():
+                if not chars.isalpha():
+                    catValid = False
+            if (catValid):
                 for items in catList:
                     if(items == self.CatAddEdit.text()):
                         MessageBox("Error", "Category already exists.")
@@ -177,7 +181,7 @@ class Ui_MainWindow(object):
                     backend.addCategory(str(self.CatAddEdit.text()))
                     self.UpdateCatList()
             else:
-                MessageBox("Error", "Category can't start with a digit")
+                MessageBox("Error", "Category can only contain letters")
         else:
             MessageBox("Error", "No Category Entered")
 
