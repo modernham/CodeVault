@@ -237,18 +237,25 @@ class Ui_MainWindow(object):
         self.CodeWindow.verticalScrollBar().setValue(0)
 
     def RemoveCategory(self):
-        self.CatListBox.clear()
-        self.SnipListBox.clear()
-        backend.removeCat(self.CurrentCat)
-        self.CurrentCat = ""
-        self.UpdateCatList()
+        if ([item.text() for item in self.CatListBox.selectedItems()]):
+            self.CatListBox.clear()
+            self.SnipListBox.clear()
+            backend.removeCat(self.CurrentCat)
+            self.CurrentCat = ""
+            self.UpdateCatList()
+        else:
+            MessageBox("Error", "No Category Selected.")
 
     def RemoveSnip(self):
-        self.SnipListBox.clear()
-        self.CodeWindow.clear()
-        backend.removeSnip(self.CurrentCat, self.CurrentSnip)
-        self.CurrentSnip = ""
-        self.UpdateSnipets()
+        if ([item.text() for item in self.SnipListBox.selectedItems()]):
+            self.SnipListBox.clear()
+            self.CodeWindow.clear()
+            backend.removeSnip(self.CurrentCat, self.CurrentSnip)
+            self.CurrentSnip = ""
+            self.UpdateSnipets()
+        else:
+            MessageBox("Error", "No Snippets Selected.")
+
 
 
 
