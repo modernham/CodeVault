@@ -40,6 +40,7 @@ class Ui_MainWindow(object):
         # Populate the Categories (tables) List
         #Bind function that gets rows from categories table when changed.
         self.CatListBox.itemClicked.connect(self.UpdateSnipets)
+        self.CatListBox.doubleClicked.connect(self.RenameCategory)
 
         #Catagory Edit (add) Box
         self.CatAddEdit = QtWidgets.QLineEdit(self.CategoriesBox)
@@ -86,6 +87,7 @@ class Ui_MainWindow(object):
         self.SnipListBox.setGeometry(QtCore.QRect(10, 150, 160, 571))
         self.SnipListBox.setObjectName("SnipListBox")
         self.SnipListBox.itemClicked.connect(self.SetCode)
+        self.SnipListBox.doubleClicked.connect(self.RenameSnip)
 
 
         self.SnipAddEdit = QtWidgets.QLineEdit(self.SnipetsBox)
@@ -190,7 +192,7 @@ class Ui_MainWindow(object):
         self.CatListBox.clear()
         for items in backend.getCategories():
             if(self.CatFilterEdit.text()):
-                if (self.CatFilterEdit.text() in items[0]):
+                if (self.CatFilterEdit.text().lower() in items[0].lower()):
                     self.CatListBox.addItem(items[0])
             else:
                 self.CatListBox.addItem(items[0])
@@ -201,7 +203,7 @@ class Ui_MainWindow(object):
         self.SnipListBox.clear()
         for items in backend.getSnipets(self.CurrentCat):
             if(self.SnipFilterEdit.text()):
-                if (self.SnipFilterEdit.text() in items[0]):
+                if (self.SnipFilterEdit.text().lower() in items[0].lower()):
                     self.SnipListBox.addItem(items[0])
             else:
                 self.SnipListBox.addItem(items[0])
@@ -259,6 +261,50 @@ class Ui_MainWindow(object):
             self.UpdateSnipets()
         else:
             MessageBox("Error", "No Snippets Selected.")
+
+    def RenameCategory(self):
+        catList = [self.CatListBox.item(i).text() for i in range(self.CatListBox.count())]
+        catExists= False
+        self.CurrentCat = [item.text() for item in self.CatListBox.selectedItems()][0]
+        if (self.CurrentCat):
+            newName = self.getText("Rename:", "New Category Name:")
+            if (newName):
+                if(newName.isalpha()):
+                    for items in catList:
+                        if(items == newName):
+                            MessageBox("Error", "Category already exists.")
+                            catExists = True
+                    if not (catExists):
+                        backend.renamecategory(self.CurrentCat, newName)
+                        self.UpdateCatList()
+                else:
+                    MessageBox("Error", "Category can only contain letters")
+            else:
+                MessageBox("Error", "You must enter a name")
+
+    def RenameSnip(self):
+        snipList = [self.SnipListBox.item(i).text() for i in range(self.SnipListBox.count())]
+        snipExists= False
+        self.CurrentSnip = [item.text() for item in self.SnipListBox.selectedItems()][0]
+        if (self.CurrentSnip):
+            newName = self.getText("Rename", "New Snippet Name:")
+            if (newName):
+                for items in snipList:
+                    if(items == newName):
+                        MessageBox("Error", "Snippet already exists.")
+                        snipExists = True
+                if not (snipExists):
+                    backend.renamesnip(self.CurrentCat, self.CurrentSnip, newName)
+                    self.UpdateSnipets()
+            else:
+                MessageBox("Error", "You must enter a name")
+
+
+
+    def getText(self, title, message):
+        text, okPressed = QInputDialog.getText(self.centralwidget, title, message, QLineEdit.Normal, "")
+        if okPressed and text != '':
+            return text
 
 
 

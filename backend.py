@@ -39,6 +39,20 @@ def updateCode(category, codeName, code):
     conn.commit()
     conn.close()
 
+def renamecategory(currentName, newName):
+    conn = sqlite3.connect("codes.db")
+    cur = conn.cursor()
+    cur.execute("ALTER TABLE " + currentName + " RENAME TO " + newName)
+    conn.commit()
+    conn.close()
+
+def renamesnip(category, currentName, newName):
+    conn = sqlite3.connect("codes.db")
+    cur = conn.cursor()
+    cur.execute("UPDATE " + category + " SET name=? WHERE name=?", (newName, currentName))
+    conn.commit()
+    conn.close()
+
 def removeCat(category):
     conn=sqlite3.connect("codes.db")
     cur=conn.cursor()
