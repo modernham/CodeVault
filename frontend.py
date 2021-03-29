@@ -6,7 +6,7 @@ UI design by QT designer
 
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
-import backend
+import SQL
 
 
 
@@ -17,6 +17,7 @@ class Ui_MainWindow(object):
 
     #Setup Basic Layout and create the Widgets.
     def setupUi(self, MainWindow):
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1229, 791)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -137,6 +138,7 @@ class Ui_MainWindow(object):
         font.setWeight(50)
         self.CodeWindow.setFont(font)
         self.CodeWindow.setObjectName("CodeWindow")
+        self.CodeWindow.setEnabled(False)
 
         #Code to Save Code Changes to The Currently selected Code
         self.CodeUpdateSaveBtn = QtWidgets.QPushButton(self.CodeBox)
@@ -151,6 +153,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "CodeVault"))
@@ -164,6 +167,7 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "Filter"))
         self.CodeBox.setTitle(_translate("MainWindow", "Code"))
         self.CodeUpdateSaveBtn.setText(_translate("MainWindow", "Update/Save"))
+
 
     # Button Event Handling
     def AddCategory(self):
@@ -180,7 +184,7 @@ class Ui_MainWindow(object):
                         MessageBox("Error", "Category already exists.")
                         catExists = True
                 if not (catExists):
-                    backend.addCategory(str(self.CatAddEdit.text()))
+                    SQL.addCategory(str(self.CatAddEdit.text()))
                     self.UpdateCatList()
             else:
                 MessageBox("Error", "Category can only contain letters")
@@ -190,7 +194,7 @@ class Ui_MainWindow(object):
     #Update CategoryList When we Start the program or add/remove Categories or change the filter
     def UpdateCatList(self):
         self.CatListBox.clear()
-        for items in backend.getCategories():
+        for items in SQL.getCategories():
             if(self.CatFilterEdit.text()):
                 if (self.CatFilterEdit.text().lower() in items[0].lower()):
                     self.CatListBox.addItem(items[0])
@@ -201,7 +205,9 @@ class Ui_MainWindow(object):
     def UpdateSnipets(self):
         self.CurrentCat = [item.text() for item in self.CatListBox.selectedItems()][0]
         self.SnipListBox.clear()
-        for items in backend.getSnipets(self.CurrentCat):
+        self.CodeWindow.clear()
+        self.CodeWindow.setEnabled(False)
+        for items in SQL.getSnipets(self.CurrentCat):
             if(self.SnipFilterEdit.text()):
                 if (self.SnipFilterEdit.text().lower() in items[0].lower()):
                     self.SnipListBox.addItem(items[0])
@@ -219,7 +225,7 @@ class Ui_MainWindow(object):
                     snipExists = True
             if(self.CurrentCat):
                 if not (snipExists):
-                    backend.addSnipet(self.CurrentCat, str(self.SnipAddEdit.text()))
+                    SQL.addSnipet(self.CurrentCat, str(self.SnipAddEdit.text()))
                     self.UpdateSnipets()
             else:
                 MessageBox("Error", "No Category Selected.")
@@ -229,7 +235,7 @@ class Ui_MainWindow(object):
     def UpdateCode(self):
         if(self.CodeWindow.toPlainText()):
                 if(self.CurrentSnip):
-                    backend.updateCode(self.CurrentCat,self.CurrentSnip,  str(self.CodeWindow.toPlainText()))
+                    SQL.updateCode(self.CurrentCat, self.CurrentSnip, str(self.CodeWindow.toPlainText()))
                     MessageBox("Saved", "Code was saved successfully")
                 else:
                     MessageBox("Error", "No Code Snippet Selected")
@@ -239,14 +245,15 @@ class Ui_MainWindow(object):
     def SetCode(self):
         self.CurrentSnip = [item.text() for item in self.SnipListBox.selectedItems()][0]
         self.CodeWindow.clear()
-        self.CodeWindow.appendPlainText(backend.getCode(self.CurrentCat, self.CurrentSnip))
+        self.CodeWindow.appendPlainText(SQL.getCode(self.CurrentCat, self.CurrentSnip))
         self.CodeWindow.verticalScrollBar().setValue(0)
+        self.CodeWindow.setEnabled(True)
 
     def RemoveCategory(self):
         if ([item.text() for item in self.CatListBox.selectedItems()]):
             self.CatListBox.clear()
             self.SnipListBox.clear()
-            backend.removeCat(self.CurrentCat)
+            SQL.removeCat(self.CurrentCat)
             self.CurrentCat = ""
             self.UpdateCatList()
         else:
@@ -256,9 +263,10 @@ class Ui_MainWindow(object):
         if ([item.text() for item in self.SnipListBox.selectedItems()]):
             self.SnipListBox.clear()
             self.CodeWindow.clear()
-            backend.removeSnip(self.CurrentCat, self.CurrentSnip)
+            SQL.removeSnip(self.CurrentCat, self.CurrentSnip)
             self.CurrentSnip = ""
             self.UpdateSnipets()
+            self.CodeWindow.setEnabled(False)
         else:
             MessageBox("Error", "No Snippets Selected.")
 
@@ -275,12 +283,13 @@ class Ui_MainWindow(object):
                             MessageBox("Error", "Category already exists.")
                             catExists = True
                     if not (catExists):
-                        backend.renamecategory(self.CurrentCat, newName)
+                        SQL.renamecategory(self.CurrentCat, newName)
                         self.UpdateCatList()
                 else:
                     MessageBox("Error", "Category can only contain letters")
             else:
-                MessageBox("Error", "You must enter a name")
+                if(newName != False):
+                    MessageBox("Error", "You must enter a name")
 
     def RenameSnip(self):
         snipList = [self.SnipListBox.item(i).text() for i in range(self.SnipListBox.count())]
@@ -294,10 +303,11 @@ class Ui_MainWindow(object):
                         MessageBox("Error", "Snippet already exists.")
                         snipExists = True
                 if not (snipExists):
-                    backend.renamesnip(self.CurrentCat, self.CurrentSnip, newName)
+                    SQL.renamesnip(self.CurrentCat, self.CurrentSnip, newName)
                     self.UpdateSnipets()
             else:
-                MessageBox("Error", "You must enter a name")
+                if (newName != False):
+                    MessageBox("Error", "You must enter a name")
 
 
 
@@ -305,6 +315,8 @@ class Ui_MainWindow(object):
         text, okPressed = QInputDialog.getText(self.centralwidget, title, message, QLineEdit.Normal, "")
         if okPressed and text != '':
             return text
+        if not okPressed:
+            return False
 
 
 
@@ -317,6 +329,7 @@ def MessageBox(Title, Message):
     msg.setStandardButtons(QMessageBox.Ok)
     msg.exec_()
 
+
 if __name__ == "__main__":
     #Setup the QT window and handle themes.
     import sys
@@ -325,6 +338,8 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     app.setStyle('Fusion')
+
+    #Set Dark Theme Look/Feel
     palette = QtGui.QPalette()
     palette.setColor(QtGui.QPalette.Window, QtGui.QColor(53, 53, 53))
     palette.setColor(QtGui.QPalette.WindowText, QtCore.Qt.white)
@@ -336,13 +351,14 @@ if __name__ == "__main__":
     palette.setColor(QtGui.QPalette.Button, QtGui.QColor(53, 53, 53))
     palette.setColor(QtGui.QPalette.ButtonText, QtCore.Qt.white)
     palette.setColor(QtGui.QPalette.BrightText, QtCore.Qt.red)
-    palette.setColor(QtGui.QPalette.Highlight, QtGui.QColor(142, 45, 197).lighter())
-    palette.setColor(QtGui.QPalette.HighlightedText, QtCore.Qt.black)
+    palette.setColor(QtGui.QPalette.Highlight, QtGui.QColor(50, 45, 197).lighter())
+    palette.setColor(QtGui.QPalette.HighlightedText, QtCore.Qt.white)
     app.setPalette(palette)
 
     #Create the database if one doesn't exist.
-    backend.connect()
+    SQL.connect()
 
     #Show the window
     MainWindow.show()
     sys.exit(app.exec_())
+
